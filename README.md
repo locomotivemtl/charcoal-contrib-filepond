@@ -15,19 +15,22 @@ This contrib act in fact as an upload server to go along with FilePond.
 
 ## Table of Contents
 
--   [Installation](#installation)
-    -   [Dependencies](#dependencies)
--   [Service Provider](#service-provider)
-    -   [Parameters](#parameters)
-    -   [Services](#services)
--   [Configuration](#configuration)
--   [Usage](#usage)
--   [Development](#development)
-    -  [API Documentation](#api-documentation)
-    -  [Development Dependencies](#development-dependencies)
-    -  [Coding Style](#coding-style)
--   [Credits](#credits)
--   [License](#license)
+- [Charcoal FilePond](#charcoal-filepond)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+    - [Dependencies](#dependencies)
+      - [Required](#required)
+  - [Service Provider](#service-provider)
+    - [Services](#services)
+  - [Configuration](#configuration)
+    - [Server options.](#server-options)
+  - [Usage](#usage)
+  - [Development](#development)
+    - [API Documentation](#api-documentation)
+    - [Development Dependencies](#development-dependencies)
+    - [Coding Style](#coding-style)
+  - [Credits](#credits)
+  - [License](#license)
 
 
 
@@ -73,8 +76,8 @@ The service provider is automatically instantiated by the module.
     
     ```php
     $action = new RequestAction([
-        'logger'          => $container['logger'],
-        'filePondService' => $container['file-pond/service']($serverIdent),
+        'logger'          => $container->get('logger'),
+        'filePondService' => $container->get('file-pond/service')($serverIdent),
     ]);
     ```
     
@@ -161,14 +164,14 @@ class SomeAction extends AbstractAction
     /**
      * Inject dependencies from a DI Container.
      *
-     * @param Container $container A Pimple DI service container.
+     * @param ContainerInterface $container A Pimple DI service container.
      * @return void
      */
-    public function setDependencies(Container $container)
+    public function setDependencies(ContainerInterface $container)
     {
         parent::setDependencies($container);
 
-        $this->setFilePondService($container['file-pond/service']('private'));
+        $this->setFilePondService($container->get('file-pond/service')('private'));
     }
 }
 ```
