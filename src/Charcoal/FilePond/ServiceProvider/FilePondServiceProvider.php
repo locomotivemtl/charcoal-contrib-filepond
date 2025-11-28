@@ -4,15 +4,13 @@ namespace Charcoal\FilePond\ServiceProvider;
 
 use Charcoal\FilePond\FilePondConfig;
 use Charcoal\FilePond\Service\FilePondService;
-
-// from 'pimple'
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
+use Psr\Container\ContainerInterface;
+use DI\Container;
 
 /**
  * File Pond Service Provider
  */
-class FilePondServiceProvider implements ServiceProviderInterface
+class FilePondServiceProvider
 {
     /**
      * Registers services on the given container.
@@ -23,28 +21,28 @@ class FilePondServiceProvider implements ServiceProviderInterface
      * @param Container $container A container instance.
      * @return void
      */
-    public function register(Container $container)
+    public function register(ContainerInterface $container)
     {
         /**
-         * @param Container $container The Pimple DI container.
+         * @param Container $container The PHP-DI container.
          * @return FilePondConfig
          */
-        $container['file-pond/config'] = function (Container $container) {
-            $config = $container['config']->get('contrib.file-pond.config') ?: [];
+        $container->set('file-pond/config', function (ContainerInterface $container) {
+            $config = $container->get('config')->get('contrib.file-pond.config') ?: [];
             return new FilePondConfig($config);
-        };
+        });
 
         /**
-         * @param Container $container The Pimple DI container.
+         * @param Container $container The PHP-DI container.
          * @return FilePondService
          */
-        $container['file-pond/service'] = function (Container $container) {
+        $container->set('file-pond/service', function (ContainerInterface $container) {
             return new FilePondService(
-                $container['file-pond/config'],
-                $container['filesystem/config'],
-                $container['filesystem/manager'],
-                $container['filesystems']
+                $container->get('file-pond/config'),
+                $container->get('filesystem/config'),
+                $container->get('filesystem/manager'),
+                $container->get('filesystems')
             );
-        };
+        });
     }
 }

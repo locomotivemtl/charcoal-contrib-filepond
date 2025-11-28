@@ -20,8 +20,8 @@ use League\Flysystem\MountManager;
 use League\Flysystem\Util;
 
 // from 'Psr-7'
-use Pimple\Container;
 use Psr\Http\Message\RequestInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * File Pond Service
@@ -78,9 +78,9 @@ class FilePondService
      * @param ConfigInterface|FilePondConfig   $config           The service Config.
      * @param ConfigInterface|FilesystemConfig $filesystemConfig The Filesystem Config.
      * @param MountManager|FilesystemInterface $mountManager     The Filesystem MountManager.
-     * @param Container|FilesystemInterface[]  $filesystems      The available filesystems.
+     * @param ContainerInterface|FilesystemInterface[]  $filesystems      The available filesystems.
      */
-    public function __construct($config, $filesystemConfig, $mountManager, Container $filesystems)
+    public function __construct($config, $filesystemConfig, $mountManager, ContainerInterface $filesystems)
     {
         /** @see \Charcoal\App\ServiceProvider\FilesystemServiceProvider */
         $this->config = $config;

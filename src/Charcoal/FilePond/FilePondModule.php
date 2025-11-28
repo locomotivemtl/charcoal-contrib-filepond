@@ -5,18 +5,15 @@ namespace Charcoal\FilePond;
 // from 'charcoal-app'
 use Charcoal\App\App;
 use Charcoal\App\Module\AbstractModule;
-
 // from 'charcoal-contrib-filepond'
 use Charcoal\FilePond\Action\RequestAction;
 use Charcoal\FilePond\ServiceProvider\FilePondServiceProvider;
-
-// from 'pimple'
-use Pimple\Container;
-
 // from 'Psr-7'
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
+use Slim\Interfaces\RouteCollectorProxyInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * FilePond Module
@@ -31,13 +28,12 @@ class FilePondModule extends AbstractModule
      */
     public function setup()
     {
-        /** @var Container $container */
+        /** @var ContainerInterface $container */
         $container = $this->app()->getContainer();
 
-        $FilePondServiceProvider = new FilePondServiceProvider();
-        $container->register($FilePondServiceProvider);
+        (new FilePondServiceProvider())->register($container);
 
-        $servers = $container['file-pond/config']->getServers();
+        $servers = $container->get('file-pond/config')->getServers();
 
         foreach ($servers as $serverIdent => $server) {
             $route = $server['route'];
@@ -50,37 +46,37 @@ class FilePondModule extends AbstractModule
                 ));
             }
 
-            $route = '/'.ltrim($route, '\/ ');
+            $route = '/' . ltrim($route, '\/ ');
 
-            $this->app()->group(rtrim($route, '/'), function (App $app) use ($serverIdent) {
-                $app->get('', function (Request $request, Response $response) use ($serverIdent) {
-                    /** @var Container $container */
+            $this->app()->group(rtrim($route, '/'), function (RouteCollectorProxyInterface $group) use ($serverIdent) {
+                $group->get('', function (Request $request, Response $response) use ($serverIdent) {
+                    /** @var ContainerInterface $container */
                     $container = $this;
                     $action    = new RequestAction([
-                        'logger'          => $container['logger'],
-                        'filePondService' => $container['file-pond/service']($serverIdent),
+                        'logger'          => $container->get('logger'),
+                        'filePondService' => $container->get('file-pond/service')($serverIdent),
                     ]);
 
                     return $action($request, $response);
                 });
 
-                $app->post('', function (Request $request, Response $response) use ($serverIdent) {
-                    /** @var Container $container */
+                $group->post('', function (Request $request, Response $response) use ($serverIdent) {
+                    /** @var ContainerInterface $container */
                     $container = $this;
                     $action    = new RequestAction([
-                        'logger'          => $container['logger'],
-                        'filePondService' => $container['file-pond/service']($serverIdent),
+                        'logger'          => $container->get('logger'),
+                        'filePondService' => $container->get('file-pond/service')($serverIdent),
                     ]);
 
                     return $action($request, $response);
                 });
 
-                $app->delete('', function (Request $request, Response $response) use ($serverIdent) {
-                    /** @var Container $container */
+                $group->delete('', function (Request $request, Response $response) use ($serverIdent) {
+                    /** @var ContainerInterface $container */
                     $container = $this;
                     $action    = new RequestAction([
-                        'logger'          => $container['logger'],
-                        'filePondService' => $container['file-pond/service']($serverIdent),
+                        'logger'          => $container->get('logger'),
+                        'filePondService' => $container->get('file-pond/service')($serverIdent),
                     ]);
 
                     return $action($request, $response);
